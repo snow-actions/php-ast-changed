@@ -29,8 +29,8 @@ steps:
 
 | Name | Description | Default | Required |
 | - | - | - | - |
-| `php-version` | PHP version https://github.com/shivammathur/setup-php#tada-php-support | `8.1` | no |
-| `ast-version` | AST version https://github.com/nikic/php-ast#ast-versioning | `85` | no |
+| `php-version` | PHP version of [shivammathur/setup-php](https://github.com/shivammathur/setup-php#tada-php-support) | `8.1` | no |
+| `ast-version` | AST version of [nikic/php-ast](https://github.com/nikic/php-ast#ast-versioning) | `85` | no |
 
 ## Outputs
 
@@ -59,6 +59,7 @@ steps:
 
 - [actions/checkout@v3](https://github.com/actions/checkout)
 - [shivammathur/setup-php@v2](https://github.com/shivammathur/setup-php)
+- [nikic/php-ast](https://github.com/nikic/php-ast)
 
 ## Contributing
 
