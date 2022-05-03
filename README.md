@@ -1,50 +1,42 @@
 [![Test](https://github.com/snow-actions/composite-action-template/actions/workflows/test.yml/badge.svg)](https://github.com/snow-actions/composite-action-template/actions/workflows/test.yml)
 
-# Create a Composite Action
+# PHP AST Changed
 
-Click the `Use this template` to bootstrap the creation of a [composite action](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action).:rocket:
-
-This template includes tests, a validation workflow and versioning guidance.
-
-Learn how to use this template at [Wiki](https://github.com/snow-actions/composite-action-template/wiki).
+Check if PHP AST have been changed in a pull request.
 
 ## Usage
 
 See [action.yml](action.yml)
 
-### Basic
-
 ```yml
 steps:
-  - uses: snow-actions/composite-action-template@v1.0.0
+  - uses: snow-actions/php-ast-changed@v1.0.0
+    id: php-ast
+  - name: Label
+    run: |
+      set -x
+      label='needless-debug'
+      if [ "${changed}" = 'false' ]; then
+        gh pr edit ${{ github.event.number }} --add-label ${label}
+      else
+        gh pr edit ${{ github.event.number }} --remove-label ${label}
+      fi
+    env:
+      changed: ${{ steps.php-ast.outputs.changed }}
 ```
-
-### Optional
-
-```yml
-steps:
-  - uses: snow-actions/composite-action-template@v1.0.0
-    with:
-      who-to-greet: Your name
-```
-
-## Environment variables
-
-| Name | Description | Default | Required |
-| - | - | - | - |
-| `WHO_TO_GREET` | Who to greet | `World` | no |
 
 ## Inputs
 
 | Name | Description | Default | Required |
 | - | - | - | - |
-| `who-to-greet` | Who to greet | `World` | yes |
+| `php-version` | PHP version https://github.com/shivammathur/setup-php#tada-php-support | `8.1` | no |
+| `ast-version` | AST version https://github.com/nikic/php-ast#ast-versioning | `85` | no |
 
 ## Outputs
 
-| Name | Description |
-| - | - |
-| `greet` | The word we greeted you |
+| Name | Type | Description |
+| - | - | - |
+| `changed` | string | AST of \*.php files have changed: "true", not changed: "false" |
 
 ## Supported
 
@@ -60,16 +52,13 @@ steps:
 
 ### Events
 
-- Any
-<!--
-- `push`
 - `pull_request`
--->
+- `pull_request_target`
 
 ## Dependencies
 
-- [actions/cache](https://github.com/actions/cache) >= 3.0.0
-- [GitHub CLI](https://cli.github.com/) >= 2.6.0
+- [actions/checkout@v3](https://github.com/actions/checkout)
+- [shivammathur/setup-php@v2](https://github.com/shivammathur/setup-php)
 
 ## Contributing
 
