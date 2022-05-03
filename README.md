@@ -57,7 +57,8 @@ steps:
 
 ## Dependencies
 
-- [actions/checkout](https://github.com/actions/checkout) >= 3.0.0
+- [actions/checkout@v3](https://github.com/actions/checkout)
+- [shivammathur/setup-php@v2](https://github.com/shivammathur/setup-php)
 
 ## Contributing
 
