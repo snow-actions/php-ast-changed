@@ -1,5 +1,5 @@
 name: 'PHP AST Changed'
-description: 'Check if PHP AST have changed'
+description: 'Check if PHP AST have been changed in a pull request'
 
 inputs:
   php-version:
