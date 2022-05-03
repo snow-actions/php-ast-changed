@@ -1,26 +1,81 @@
-name: 'Composite Action Template'
-description: 'Get started with Composite actions'
+name: 'PHP AST Changed'
+description: 'Check if PHP AST have changed'
+
 inputs:
-  who-to-greet:
-    description: 'Who to greet'
-    required: true
-    default: 'World'
+  php-version:
+    description: 'PHP version https://github.com/shivammathur/setup-php#tada-php-support'
+    required: false
+    default: '8.1'
+  ast-version:
+    description: 'AST version https://github.com/nikic/php-ast#ast-versioning'
+    required: false
+    default: '85'
+
 outputs:
-  greet:
-    description: 'The word we greeted you'
-    value: ${{ steps.greet.outputs.word }}
+  changed:
+    description: 'AST of *.php files have changed: "true" (string), not changed: "false" (string)'
+    value: ${{ steps.diff.outputs.exists }}
+
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
-    - id: greet
+    # setup
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: ast
+
+    # paths
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
+    - name: Download util.php
       run: |
-        GREET="Hello ${WHO}"
-        echo "${GREET}"
-        echo "${GREET}" > greet.txt
-        echo "::set-output name=word::${GREET}"
+        <?php
+        declare(strict_types=1);
+
+        $php_ast_version = phpversion('ast');
+        $url = "https://raw.githubusercontent.com/nikic/php-ast/v{$php_ast_version}/util.php";
+        echo $url;
+
+        $contents = file_get_contents($url);
+        file_put_contents('util.php', $contents);
+      shell: php {0}
+    - run: git fetch --depth=1 --no-tags origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
       shell: bash
+    - run: git diff --name-only origin/${{ github.base_ref }} -- '*.php' > ${GITHUB_ACTION_PATH}/paths
+      shell: bash
+    - run: cat ${GITHUB_ACTION_PATH}/paths
+      shell: bash
+
+    # head
+    - run: php ${GITHUB_ACTION_PATH}/php-ast-hashes.php ${version} ${GITHUB_ACTION_PATH}/paths ${GITHUB_ACTION_PATH}/head
       env:
-        WHO: ${{ inputs.who-to-greet }}
+        version: ${{ inputs.ast-version }}
+      shell: bash
+    - run: cat ${GITHUB_ACTION_PATH}/head
+      shell: bash
+
+    # base
+    - run: git switch ${{ github.base_ref }}
+      shell: bash
+    - run: php ${GITHUB_ACTION_PATH}/php-ast-hashes.php ${version} ${GITHUB_ACTION_PATH}/paths ${GITHUB_ACTION_PATH}/base
+      env:
+        version: ${{ inputs.ast-version }}
+      shell: bash
+    - run: cat ${GITHUB_ACTION_PATH}/base
+      shell: bash
+
+    # check
+    - id: diff
+      run: |
+        if diff ${GITHUB_ACTION_PATH}/base ${GITHUB_ACTION_PATH}/head; then
+          echo "::set-output name=exists::false"
+        else
+          echo "::set-output name=exists::true"
+        fi
+      shell: bash
+
 branding:
-  icon: 'award'  
-  color: 'green'
+  icon: 'alert-octagon'
+  color: 'gray-dark'
