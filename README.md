@@ -1,4 +1,6 @@
-[![Test](https://github.com/snow-actions/composite-action-template/actions/workflows/test.yml/badge.svg)](https://github.com/snow-actions/composite-action-template/actions/workflows/test.yml)
+<!--
+[![Test](https://github.com/snow-actions/php-ast-changed/actions/workflows/test.yml/badge.svg)](https://github.com/snow-actions/php-ast-changed/actions/workflows/test.yml)
+-->
 
 # PHP AST Changed
 
